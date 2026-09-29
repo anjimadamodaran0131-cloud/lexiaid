@@ -1,0 +1,108 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block backbtn %}
+<div class="back-btn">
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-inner fade-in" style="max-width:36rem;">
+
+  <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:1.5rem;">Settings</h1>
+
+  <div class="space-y-4">
+
+    <!-- Profile -->
+    <div class="card">
+      <p class="section-title">👤 Profile</p>
+      <div class="profile-row">
+        <div class="profile-avatar">
+          {{ user.first_name|first|upper }}
+        </div>
+        <div class="profile-info">
+          <strong>{{ user.first_name|default:user.username }}</strong>
+          <small>{{ user.email }}</small>
+          <span class="pts">Level {{ profile.get_level }} • {{ profile.points }} points</span>
+        </div>
+      </div>
+    </div>
+
+   <!-- Display Preferences -->
+<div class="card space-y-4">
+  <p class="section-title">🎨 Display Preferences</p>
+
+  <div>
+    <span class="field-label">Default Font</span>
+    <div class="chip-group" id="settings-font-chips">
+      <span class="chip active" data-val="opendyslexic" onclick="settingsChip('settings-font-chips', this, 'font')">Open Dyslexic</span>
+      <span class="chip" data-val="sylexiad" onclick="settingsChip('settings-font-chips', this, 'font')">Sylexiad</span>
+      <span class="chip" data-val="courier" onclick="settingsChip('settings-font-chips', this, 'font')">Courier</span>
+      <span class="chip" data-val="verdana" onclick="settingsChip('settings-font-chips', this, 'font')">Verdana</span>
+    </div>
+  </div>
+
+  <div>
+    <span class="field-label">Default Size</span>
+    <div class="chip-group" id="settings-size-chips">
+      <span class="chip" data-val="16" onclick="settingsChip('settings-size-chips', this, 'size')">Small<br><small>16px</small></span>
+      <span class="chip active" data-val="18" onclick="settingsChip('settings-size-chips', this, 'size')">Medium<br><small>18px</small></span>
+      <span class="chip" data-val="22" onclick="settingsChip('settings-size-chips', this, 'size')">Large<br><small>22px</small></span>
+    </div>
+  </div>
+
+  <div>
+    <span class="field-label">Background Color</span>
+    <div class="color-swatches" id="settings-bg-swatches">
+      <div class="swatch active" style="background:#FDF6E3;" data-val="cream" title="Cream" onclick="settingsSwatch(this)"></div>
+      <div class="swatch" style="background:#FDDCBA;" data-val="peach" title="Peach" onclick="settingsSwatch(this)"></div>
+      <div class="swatch" style="background:#FFE0B2;" data-val="lightorange" title="Light Orange" onclick="settingsSwatch(this)"></div>
+      <div class="swatch" style="background:#FFF3CD;" data-val="warmyellow" title="Warm Yellow" onclick="settingsSwatch(this)"></div>
+      <div class="swatch" style="background:#FBCEB1;" data-val="apricot" title="Apricot" onclick="settingsSwatch(this)"></div>
+    </div>
+  </div>
+</div>
+    <!-- Audio Preferences -->
+<div class="card space-y-4">
+  <p class="section-title">🔊 Audio Preferences</p>
+
+  <div>
+    <div class="range-row">
+      <span>Default Voice Speed</span>
+      <span id="settings-speed-val">1.0x</span>
+    </div>
+    <input type="range" min="0.5" max="2" step="0.1" value="1"
+      id="settings-speed-range"
+      oninput="settingsSpeed(this)">
+  </div>
+
+  <div>
+    <span class="field-label">Preferred Voice</span>
+    <div class="chip-group" id="settings-voice-chips">
+      <span class="chip active" data-val="female" onclick="settingsChip('settings-voice-chips', this, 'voice')">Female</span>
+      <span class="chip" data-val="male" onclick="settingsChip('settings-voice-chips', this, 'voice')">Male</span>
+    </div>
+  </div>
+</div>
+    
+
+    <!-- Quick Links -->
+    <div class="card">
+      <p class="section-title">🔗 Quick Links</p>
+      <a href="{% url 'leaderboard' %}" class="quick-link">
+        <span>View Leaderboard</span>
+        <span>→</span>
+      </a>
+    </div>
+
+    <!-- Logout -->
+    <a href="{% url 'logout' %}" class="btn btn-danger btn-full btn-lg"
+      style="text-decoration:none;margin-top:.5rem;">
+      🚪 Log Out
+    </a>
+
+  </div>
+</div>
+{% endblock %}

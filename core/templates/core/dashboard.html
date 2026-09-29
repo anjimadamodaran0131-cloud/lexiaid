@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block backbtn %}{% endblock %}
+
+{% block content %}
+<div class="page-inner fade-in">
+
+  <!-- Welcome -->
+  <div class="dash-welcome">
+    <h1>Welcome back, <span>{{ user.first_name|default:user.username }}</span>!</h1>
+    <p>Choose a tool below to start your learning session. Each activity earns you points!</p>
+  </div>
+
+  <!-- Level Card -->
+  <div class="level-card">
+    <div class="level-label">
+      <small>Current Level</small>
+      <strong>Level {{ profile.get_level }}</strong>
+    </div>
+    <div class="level-progress">
+      <div class="prog-row">
+        <span>Progress to next level</span>
+        <span>{{ points_in_level }} / 500</span>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:{{ progress }}%"></div>
+      </div>
+    </div>
+    <div class="level-pts">{{ profile.points }} pts</div>
+  </div>
+
+  <!-- Feature Cards -->
+  <div class="feature-grid">
+
+    <a href="{% url 'text_converter' %}" class="feature-card">
+      <div class="feature-icon" style="background:hsla(24,75%,50%,0.12)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(24,75%,50%)" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Text Converter</h2>
+        <p>Upload PDF or type text to convert into dyslexia-friendly format with adjustable fonts, colors, and spacing.</p>
+      </div>
+      <div class="feature-cta">Get Started →</div>
+    </a>
+
+    <a href="{% url 'speech_to_text' %}" class="feature-card">
+      <div class="feature-icon" style="background:hsla(42,85%,68%,0.25)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(20,30%,18%)" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Speech to Text</h2>
+        <p>Record your voice and convert it to readable, formatted text instantly.</p>
+      </div>
+      <div class="feature-cta">Get Started →</div>
+    </a>
+
+    <a href="{% url 'text_to_speech' %}" class="feature-card">
+      <div class="feature-icon" style="background:hsl(140,40%,90%)">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(140,50%,35%)" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Text to Speech</h2>
+        <p>Listen to any text read aloud with word highlighting and adjustable speed.</p>
+      </div>
+      <div class="feature-cta">Get Started →</div>
+    </a>
+
+  </div>
+
+  <!-- Daily Tip -->
+  <div class="daily-tip mt-6">
+    <div class="tip-badge">💡 Daily Tip</div>
+    <p>{{ tip }}</p>
+  </div>
+
+</div>
+{% endblock %}

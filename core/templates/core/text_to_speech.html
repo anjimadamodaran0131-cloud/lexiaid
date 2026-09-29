@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Text to Speech{% endblock %}
+
+{% block backbtn %}
+<div class="back-btn">
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-inner fade-in">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="icon-wrap" style="background:hsl(140,40%,90%)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="hsl(140,50%,35%)" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+    </div>
+    <h1>Text to Speech</h1>
+    <p>Type or paste text below and listen to it read aloud.</p>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Left Column -->
+    <div class="space-y-4">
+      <div class="card space-y-4">
+        <h3>Enter Text</h3>
+        <textarea id="tts-input" class="input-field" rows="8"
+          placeholder="Type or paste your text here…"></textarea>
+        <div>
+          <p class="field-label mb-2">Try a sample:</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="font-size:.8rem;padding:.4rem .85rem;" onclick="ttsSample(0)">Sample 1</button>
+            <button class="btn btn-secondary" style="font-size:.8rem;padding:.4rem .85rem;" onclick="ttsSample(1)">Sample 2</button>
+            <button class="btn btn-secondary" style="font-size:.8rem;padding:.4rem .85rem;" onclick="ttsSample(2)">Sample 3</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.75rem;">
+        <button class="btn btn-primary btn-lg" style="flex:1;" id="tts-play-btn" onclick="ttsPlay()">
+          ▶ Play
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="ttsReset()">
+          🔄 Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="space-y-4">
+      <div class="card space-y-5">
+        <h3>Voice Settings</h3>
+
+        <div>
+          <span class="field-label">Voice</span>
+          <select id="tts-voice-select" class="input-field"></select>
+        </div>
+
+        <div>
+          <div class="range-row">
+            <span>Speed</span>
+            <span id="tts-speed-val">1.0x</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <span style="font-size:.75rem;color:var(--muted);">Slower</span>
+            <input type="range" min="0.5" max="2" step="0.1" value="1"
+              id="tts-speed-range" oninput="ttsRangeUpdate()" style="flex:1;">
+            <span style="font-size:.75rem;color:var(--muted);">Faster</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="range-row">
+            <span>Pitch</span>
+            <span id="tts-pitch-val">1.0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;">
+            <span style="font-size:.75rem;color:var(--muted);">Lower</span>
+            <input type="range" min="0.5" max="2" step="0.1" value="1"
+              id="tts-pitch-range" oninput="ttsRangeUpdate()" style="flex:1;">
+            <span style="font-size:.75rem;color:var(--muted);">Higher</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💡 Tips</h3>
+        <ul class="tips-list">
+          <li>Slower speeds help with comprehension</li>
+          <li>Try different voices to find what works best</li>
+          <li>Earn points for every text you listen to!</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Populate voices when page loads
+  window.addEventListener('load', function() {
+    populateTtsVoices();
+    if (window.speechSynthesis) {
+      speechSynthesis.onvoiceschanged = populateTtsVoices;
+    }
+  });
+</script>
+{% endblock %}

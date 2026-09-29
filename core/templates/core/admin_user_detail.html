@@ -1,0 +1,153 @@
+{% extends 'core/base.html' %}
+
+{% block title %}User Detail - {{ selected_user.username }}{% endblock %}
+
+{% block backbtn %}
+<div class="back-btn">
+  <a href="{% url 'admin_panel' %}">← Back to Admin Panel</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-inner fade-in">
+
+  <!-- User Profile Card -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div style="
+        width:60px;height:60px;border-radius:50%;
+        background:var(--primary);color:white;
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.5rem;font-weight:800;
+      ">
+        {{ selected_user.first_name|first|upper|default:selected_user.username|first|upper }}
+      </div>
+      <div>
+        <h2 style="margin:0;">{{ selected_user.get_full_name|default:selected_user.username }}</h2>
+        <p style="color:var(--muted);margin:0;">{{ selected_user.email }}</p>
+        <p style="color:var(--primary);margin:0;font-size:0.85rem;">
+          Joined: {{ selected_user.date_joined|date:"d M Y" }}
+          {% if selected_user.is_superuser %}
+            • <strong>Superuser</strong>
+          {% endif %}
+        </p>
+      </div>
+      <div style="margin-left:auto;text-align:center;">
+        {% if selected_user.profile %}
+        <div style="font-size:1.8rem;font-weight:800;color:var(--primary);">
+          {{ selected_user.profile.points }}
+        </div>
+        <div style="color:var(--muted);font-size:0.85rem;">Points</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--primary);">
+          Level {{ selected_user.profile.get_level }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem;font-weight:800;color:var(--primary);">{{ pdf_history.count }}</div>
+      <div style="color:var(--muted);">PDFs Uploaded</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem;font-weight:800;color:var(--primary);">{{ assessments.count }}</div>
+      <div style="color:var(--muted);">Assessments Done</div>
+    </div>
+  </div>
+
+  <!-- PDF History -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3 style="margin-bottom:1rem;">📄 PDF History</h3>
+    {% if pdf_history %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--primary);">
+            <th style="padding:0.5rem;text-align:left;">#</th>
+            <th style="padding:0.5rem;text-align:left;">PDF Name</th>
+            <th style="padding:0.5rem;text-align:left;">Keywords</th>
+            <th style="padding:0.5rem;text-align:left;">Summary Points</th>
+            <th style="padding:0.5rem;text-align:left;">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pdf in pdf_history %}
+          <tr style="border-bottom:1px solid var(--secondary);">
+            <td style="padding:0.5rem;">{{ forloop.counter }}</td>
+            <td style="padding:0.5rem;">{{ pdf.pdf_name }}</td>
+            <td style="padding:0.5rem;">
+              {% for kw in pdf.keywords %}
+                <span style="background:rgba(255,220,50,0.4);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;margin-right:0.2rem;">{{ kw }}</span>
+              {% empty %}
+                <span style="color:var(--muted);">-</span>
+              {% endfor %}
+            </td>
+            <td style="padding:0.5rem;">
+              {% if pdf.summary_points %}
+                <ul style="margin:0;padding-left:1rem;">
+                  {% for point in pdf.summary_points %}
+                    <li style="font-size:0.8rem;color:var(--muted);">{{ point }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <span style="color:var(--muted);">-</span>
+              {% endif %}
+            </td>
+            <td style="padding:0.5rem;">{{ pdf.created_at|date:"d M Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--muted);text-align:center;padding:1rem;">No PDFs uploaded yet</p>
+    {% endif %}
+  </div>
+
+  <!-- Reading Assessments -->
+  <div class="card">
+    <h3 style="margin-bottom:1rem;">📊 Reading Assessments</h3>
+    {% if assessments %}
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--primary);">
+            <th style="padding:0.5rem;text-align:left;">#</th>
+            <th style="padding:0.5rem;text-align:left;">Fluency</th>
+            <th style="padding:0.5rem;text-align:left;">Accuracy</th>
+            <th style="padding:0.5rem;text-align:left;">Speed</th>
+            <th style="padding:0.5rem;text-align:left;">Overall</th>
+            <th style="padding:0.5rem;text-align:left;">Feedback</th>
+            <th style="padding:0.5rem;text-align:left;">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in assessments %}
+          <tr style="border-bottom:1px solid var(--secondary);">
+            <td style="padding:0.5rem;">{{ forloop.counter }}</td>
+            <td style="padding:0.5rem;">{{ a.fluency }}%</td>
+            <td style="padding:0.5rem;">{{ a.accuracy }}%</td>
+            <td style="padding:0.5rem;">{{ a.reading_speed }}%</td>
+            <td style="padding:0.5rem;">
+              <span style="
+                font-weight:700;
+                color:{% if a.overall_score >= 80 %}var(--success){% elif a.overall_score >= 60 %}var(--primary){% else %}var(--danger){% endif %};
+              ">{{ a.overall_score }}%</span>
+            </td>
+            <td style="padding:0.5rem;font-size:0.8rem;color:var(--muted);">{{ a.feedback }}</td>
+            <td style="padding:0.5rem;">{{ a.created_at|date:"d M Y H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:var(--muted);text-align:center;padding:1rem;">No assessments done yet</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block backbtn %}
+<div class="back-btn">
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page-inner fade-in" style="max-width:36rem;">
+
+  <h1 style="font-size:1.75rem;font-weight:800;margin-bottom:1.5rem;">🏆 Leaderboard</h1>
+
+  {% if profiles %}
+  <div class="card" style="padding:0;overflow:hidden;">
+    {% for profile in profiles %}
+    <div class="lb-row">
+
+      <!-- Rank -->
+      <span class="lb-rank {% if forloop.counter == 1 %}gold{% elif forloop.counter == 2 %}silver{% else %}other{% endif %}">
+        {{ forloop.counter }}
+      </span>
+
+      <!-- Name -->
+      <span class="lb-name">
+        {{ profile.user.first_name|default:profile.user.username }}
+      </span>
+
+      <!-- Points -->
+      <span class="lb-pts">⭐ {{ profile.points }}</span>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="card" style="text-align:center;padding:3rem;">
+    <p style="font-size:3rem;">🏆</p>
+    <p style="color:var(--muted);margin-top:1rem;">
+      No users yet. Start using features to earn points!
+    </p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

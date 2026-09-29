@@ -1,0 +1,224 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Text Converter{% endblock %}
+
+{% block backbtn %}
+<div class="back-btn">
+  <a href="{% url 'dashboard' %}">← Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<div class="page-inner fade-in">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="icon-wrap" style="background:hsla(24,75%,50%,0.12)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="hsl(24,75%,50%)" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </div>
+    <h1>Text Converter</h1>
+    <p>Type or paste text to convert into dyslexia-friendly format.</p>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Left Column -->
+    <div class="space-y-4">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button id="tc-tab-upload" class="active" onclick="tcTab('upload')">
+          📄 Upload PDF
+        </button>
+        <button id="tc-tab-type" onclick="tcTab('type')">
+          ✏️ Type/Paste
+        </button>
+      </div>
+
+      
+     <!-- Upload Area -->
+<div id="tc-upload-area" style="display:block;">
+  <div class="drop-zone" id="drop-zone">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto .75rem;display:block;color:var(--muted)">
+      <polyline points="16 16 12 12 8 16"/>
+      <line x1="12" y1="12" x2="12" y2="21"/>
+      <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+    </svg>
+    <strong id="drop-label">Drop your PDF here</strong>
+    <small>or tap to browse</small>
+   <p style="color:var(--primary);font-size:.8rem;margin-top:.5rem;">📄 Supports PDF files up to 10MB</p>
+<p style="color:var(--muted);font-size:.75rem;margin-top:.35rem;">⚠️ Text extracted from scanned PDFs may contain inaccuracies</p>
+    <input type="file" accept=".pdf" id="pdf-input" onchange="handlePdfUpload(this)">
+  </div>
+</div>
+
+      <!-- Type Area -->
+    <div id="tc-type-area" style="display:none;">
+        <textarea id="tc-input" class="input-field" rows="6"
+          placeholder="Type or paste your text here…"></textarea>
+      </div>
+
+    <!-- AI Summary Toggle -->
+<div class="toggle-row" onclick="toggleSummary()">
+  <div class="toggle on" id="summary-toggle">
+    <div class="toggle-knob"></div>
+  </div>
+  <div class="toggle-info">
+    <strong>AI Summary</strong>
+    <small>Generate key points from your text</small>
+  </div>
+</div>
+
+
+      <!-- Formatting Options -->
+      <div class="card space-y-4">
+        <h3>✨ Formatting Options</h3>
+
+        <div>
+          <span class="field-label">Font Style</span>
+          <div class="chip-group" id="tc-font-chips">
+            <span class="chip active" data-val="opendyslexic" onclick="tcSelectFont(this)">Open Dyslexic</span>
+            <span class="chip" data-val="sylexiad" onclick="tcSelectFont(this)">Sylexiad</span>
+            <span class="chip" data-val="courier" onclick="tcSelectFont(this)">Courier</span>
+            <span class="chip" data-val="verdana" onclick="tcSelectFont(this)">Verdana</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="range-row">
+            <span>Font Size</span>
+            <span id="tc-fs-val">18px</span>
+          </div>
+          <input type="range" min="14" max="32" value="18"
+            oninput="tcRange(this,'tc-fs-val','px')">
+        </div>
+
+        <div>
+          <div class="range-row">
+            <span>Line Spacing</span>
+            <span id="tc-ls-val">1.8x</span>
+          </div>
+          <input type="range" min="1.2" max="3" step="0.1" value="1.8"
+            oninput="tcRange(this,'tc-ls-val','x',1)">
+        </div>
+
+        <div>
+          <div class="range-row">
+            <span>Letter Spacing</span>
+            <span id="tc-let-val">5%</span>
+          </div>
+          <input type="range" min="0" max="0.2" step="0.01" value="0.05"
+            oninput="tcLetRange(this)">
+        </div>
+
+        <div>
+          <span class="field-label">Background Color</span>
+          <div class="color-swatches">
+            <div class="swatch active" style="background:hsl(40,60%,95%)" data-color="hsl(40,60%,95%)" title="Cream" onclick="tcSelectBg(this)"></div>
+            <div class="swatch" style="background:hsl(25,70%,92%)" data-color="hsl(25,70%,92%)" title="Peach" onclick="tcSelectBg(this)"></div>
+            <div class="swatch" style="background:hsl(30,75%,90%)" data-color="hsl(30,75%,90%)" title="Light Orange" onclick="tcSelectBg(this)"></div>
+            <div class="swatch" style="background:hsl(45,80%,90%)" data-color="hsl(45,80%,90%)" title="Warm Yellow" onclick="tcSelectBg(this)"></div>
+            <div class="swatch" style="background:hsl(18,65%,91%)" data-color="hsl(18,65%,91%)" title="Apricot" onclick="tcSelectBg(this)"></div>
+          </div>
+        </div>
+      </div>
+
+      
+<!-- Convert Button -->
+      <!-- Convert Button -->
+     {% csrf_token %}
+<button class="btn btn-primary btn-full btn-lg" onclick="doConvert()" id="tc-convert-btn">
+  ✏️ Convert Text
+</button>
+
+
+    </div>
+
+    <!-- Right Column -->
+    <div class="space-y-4">
+
+      <!-- Preview -->
+     <div class="card" style="display:flex;flex-direction:column;">
+     
+        <h3>Preview</h3>
+
+        <div id="tc-preview-empty" class="preview-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <p>Enter some text and click Convert to see the preview</p>
+        </div>
+
+        <div id="tc-preview-box" class="preview-box" style="display:none;background:hsl(40,60%,95%);font-size:18px;line-height:1.8;letter-spacing:0.05em;flex:1;"></div>
+
+        
+<div class="action-btns" id="tc-actions" style="display:none;">
+  <button class="btn btn-primary" id="tc-read-btn" onclick="tcReadAloud()">
+    🔊 Read Aloud
+  </button>
+  <button class="btn btn-accent" onclick="startAssessment()">
+    📊 Reading Assessment
+  </button>
+  <button class="btn btn-secondary" onclick="downloadPdf()">
+    📥 Download PDF
+  </button>
+</div>
+
+      <!-- Assessment Panel -->
+      <div id="tc-assessment" class="card" style="display:none;">
+        <h3>📊 Reading Assessment</h3>
+
+        <div id="assess-recording">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1.5rem 0;">
+    
+    <!-- Mic Button -->
+    <button id="assess-mic-btn"
+      onclick="toggleMicRecording()"
+      style="
+        width:72px;height:72px;
+        border-radius:50%;
+        background:hsla(0,65%,55%,0.15);
+        border:none;cursor:pointer;
+        font-size:1.8rem;
+        transition:all 0.2s;
+      ">
+      🎤
+    </button>
+
+    <p id="assess-status" style="font-size:1rem;font-weight:700;text-align:center;">
+      Tap mic to start recording
+    </p>
+
+    <p id="assess-preview" style="font-size:.8rem;color:var(--muted);font-style:italic;text-align:center;min-height:1.2rem;"></p>
+
+    <button class="btn btn-primary" onclick="finishAssessment()">
+      ⏹ Finished Reading
+    </button>
+  </div>
+</div>
+
+        <div id="assess-analyzing" style="display:none;flex-direction:column;align-items:center;gap:.75rem;padding:2rem 0;">
+          <p style="color:var(--muted);">⏳ Analyzing your reading…</p>
+        </div>
+
+        <div id="assess-results" style="display:none;">
+          <div class="assessment-metrics" id="assess-metrics"></div>
+          <p id="assess-feedback" style="font-size:.85rem;color:var(--muted);background:var(--secondary);border-radius:.65rem;padding:.75rem;margin-top:.75rem;"></p>
+          <button class="btn btn-secondary mt-3" onclick="startAssessment()">Try Again</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
